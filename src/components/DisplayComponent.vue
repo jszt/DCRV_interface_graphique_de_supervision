@@ -3,14 +3,20 @@
     <div class="container display-container">
         <div id="circuit">
             <img id="image-circuit" class="image" src="../assets/circuit.png">
-            <img id="voiture" class="image voiture" src="../assets/tesla.png">
+            <img id="1" class="image voiture" src="../assets/tesla.png">
+            <img id="2" class="image voiture" src="../assets/tesla.png">
         </div>
     </div>
     <div class=" container display-container">
-        <div class="container-voiture">
+        {{voitures}}
+        <div 
+            v-for="voiture in voitures"
+            v-bind:key="voiture.id" 
+            class="container-voiture"
+        >
             <img class="image is-128x128" src="../assets/tesla.png">
-            <p class="title is-5 voiture-info">Voiture 1: Tesla</p>
-            <p class="subtitle is-small voiture-info"> Position: {{position}}</p>
+            <p class="title is-5 voiture-info">Voiture {{voiture.id}}: Tesla</p>
+            <p class="subtitle is-small voiture-info"> Position: {{voiture.position}}</p>
         </div>
     </div>
 </section>
@@ -21,29 +27,34 @@ export default {
     name: 'DisplayComponent',
     data() {
         return {
-            position: 0
+            position: 0,
+            voitures: []
         }
     },
     props: {
-      position: {
-        type: String
+      voiture: {
+        type: Object
       }
     },
     watch: {
       // Watch permet de surveiller des variables
       // quand une varaible change de valeur on lance une fonction
-      // ici quand la position change on effectue cette fonction: 
-      position: function (p) {
+      // ici quand l'état de la voiture change on effectue cette fonction: 
+      voiture: function (v) {
+        // On regarde si c'est la première connexion de la voiture
+        // et on ajoute la voiture sur le circuit
+        this.ajoutVoiture(v)
         // On ajoute la position dans les données du composant
-        this.position = p
+        this.updateVoiture(v)
+        //this. = parseFloat(v.position.toFixed(2))
         // On change la position de la voiture sur le circuit
         // TODO: gérer plusieurs voitures
-        this.mouvementVoiture(p, null)
+        this.mouvementVoiture(v.position, v.id)
       }
     },
     methods: {
         // Faire avancer la voiture à la position donnée
-        mouvementVoiture(position, voiture) {
+        mouvementVoiture(position, id) {
             // TODO: vérifier si position compris entre 0 et 1
 
             // TODO: Récupération de la voiture en fonction de l'id
@@ -56,11 +67,31 @@ export default {
             let y = Math.sin(2 * Math.PI * position) * 100
 
             // TODO: créer la voiture dans le code Js
-            voiture = document.getElementById("voiture")
+            let voitureImg = document.getElementById(id)
 
             // On place la voiture sur le circuit
-            voiture.style.left = 120 + x + "px";
-            voiture.style.top = 120 + y + "px";
+            voitureImg.style.left = 120 + x + "px";
+            voitureImg.style.top = 120 + y + "px";
+        },
+        ajoutVoiture(voiture){
+            // On regarde si la voiture est déjà ajoutée
+            if(this.voitures.length === 0){
+                this.voitures.push(voiture)
+            }
+            else{
+                let existe = false;
+                this.voitures.forEach(v => {
+                    if(v.id === voiture.id) existe = true
+                });
+                if(!existe) this.voitures.push(voiture)
+            }   
+        },
+        updateVoiture(voiture){
+            this.voitures.forEach((v, index) => {
+                if(voiture.id === v.id){
+                    this.voitures[index].position = voiture.position
+                }
+            });
         }
     }
 }

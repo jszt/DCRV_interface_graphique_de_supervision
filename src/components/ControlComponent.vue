@@ -27,7 +27,9 @@ export default {
         // La méthode connexion permet d'ouvrir une connexion Web socket et d'écouter les connexions entrantes venant des voitures
         connexion() {
             // On ouvre une connexion web socket avec le paramètre interface qui correspond à l'id de ce client
-            let socket = new WebSocket("ws://localhost:8000/interface")
+             let socket = new WebSocket("ws://localhost:8000/interface")
+            //let socket = new WebSocket("ws://192.168.1.45:8000/interface")
+            //let socket = new WebSocket("ws://10.22.202.44:8000/interface")
             // On stocke le socket
             this.websocket = socket
 
@@ -39,7 +41,7 @@ export default {
             // Evenement lors de la réception d'un message de la part
             socket.onmessage = function (event) {
               // On envoie la position au composant parent, qui va l'envoyer au displayComponent
-              this.$emit('position', event.data)
+              this.$emit('voiture', JSON.parse(event.data))
             }.bind(this)
 
             // Evenement lors de la fermeture de la socket

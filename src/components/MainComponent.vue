@@ -1,7 +1,7 @@
 <template>
 <div id="main">
-    <control-component @position="getPosition" />
-    <display-component v-bind:position="position"/>
+    <control-component @voiture="getEtatVoiture" />
+    <display-component v-bind:voiture="voiture"/>
 </div>
 </template>
 
@@ -17,12 +17,12 @@ export default {
     },
     data() {
         return {
-          position: 0
+          voiture: null
         }
     },
     methods: {
-      getPosition(position){
-        this.position = position;
+      getEtatVoiture(voiture){
+        this.voiture = voiture;
       }
     }
 }
