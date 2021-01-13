@@ -3,19 +3,22 @@
     <div class="container display-container">
         <div id="circuit">
             <img id="image-circuit" class="image" src="../assets/circuit.png">
-            <img id="1" class="image voiture" src="../assets/tesla.png">
-            <img id="2" class="image voiture" src="../assets/tesla.png">
+            <img
+                v-for="voiture in voitures"
+                v-bind:key="voiture.id"
+                :id="voiture.id"
+                class="image voiture" :src="getImgUrl(voiture.id)"
+            />
         </div>
     </div>
     <div class=" container display-container">
-        {{voitures}}
         <div 
             v-for="voiture in voitures"
             v-bind:key="voiture.id" 
             class="container-voiture"
         >
-            <img class="image is-128x128" src="../assets/tesla.png">
-            <p class="title is-5 voiture-info">Voiture {{voiture.id}}: Tesla</p>
+            <img class="image is-128x128" :src="getImgUrl(voiture.id)">
+            <p class="title is-5 voiture-info">Voiture : {{voiture.id}}</p>
             <p class="subtitle is-small voiture-info"> Position: {{voiture.position}}</p>
         </div>
     </div>
@@ -34,6 +37,9 @@ export default {
     props: {
       voiture: {
         type: Object
+      },
+      state: {
+        type: Boolean
       }
     },
     watch: {
@@ -41,23 +47,35 @@ export default {
       // quand une varaible change de valeur on lance une fonction
       // ici quand l'état de la voiture change on effectue cette fonction: 
       voiture: function (v) {
-        // On regarde si c'est la première connexion de la voiture
-        // et on ajoute la voiture sur le circuit
-        this.ajoutVoiture(v)
-        // On ajoute la position dans les données du composant
-        this.updateVoiture(v)
-        //this. = parseFloat(v.position.toFixed(2))
-        // On change la position de la voiture sur le circuit
-        // TODO: gérer plusieurs voitures
-        this.mouvementVoiture(v.position, v.id)
+        // On regarde le mode
+        switch (v.mode) {
+            // Quand la voiture a été déco
+            case 'DECONNEXION':
+                this.supprimerVoiture(v.id)
+            break;
+            // Quand on recoit une position
+            default:
+                // On regarde si c'est la première connexion de la voiture
+                // et on ajoute la voiture sur le circuit
+                this.ajoutVoiture(v)
+                // On ajoute la position dans les données du composant
+                this.updateVoiture(v)
+                // On change la position de la voiture sur le circuit
+                this.mouvementVoiture(v.position, v.id)
+            break;
+        }
+      },
+      state: function(state) {
+          // Si on s'est déconnecté
+          if(state === false){
+              this.voitures = [];
+          }
       }
     },
     methods: {
         // Faire avancer la voiture à la position donnée
         mouvementVoiture(position, id) {
             // TODO: vérifier si position compris entre 0 et 1
-
-            // TODO: Récupération de la voiture en fonction de l'id
 
             // Calcul de l'ordonnée et de l'abscisse
             // on inverse pour aller dans le sens positif
@@ -66,7 +84,6 @@ export default {
             let x = Math.cos(2 * Math.PI * position) * 100
             let y = Math.sin(2 * Math.PI * position) * 100
 
-            // TODO: créer la voiture dans le code Js
             let voitureImg = document.getElementById(id)
 
             // On place la voiture sur le circuit
@@ -89,9 +106,25 @@ export default {
         updateVoiture(voiture){
             this.voitures.forEach((v, index) => {
                 if(voiture.id === v.id){
-                    this.voitures[index].position = voiture.position
+                    this.voitures[index].position = parseFloat(voiture.position.toFixed(2))
                 }
             });
+        },
+        supprimerVoiture(id) {
+            this.voitures.forEach((voiture, index) => {
+                if(voiture.id === id){
+                    // supprimer la voiture
+                    this.voitures.splice(index,1)
+                }
+            });
+        },
+        // Cette fonction permet de récupérer une image après la compilation du template
+        // Elle utilisé pour afficher l'image des voitures, car on affiche leurs images après la compilation du template.
+        // Après la compilation, on ne peut plus accèder aux images via le dossier assets
+        // On récupère un lien du style /static/img/xxx.png
+        getImgUrl(id){
+            var images = require.context('../assets/', false, /\.png$/)
+            return images('./' + id + ".png")
         }
     }
 }

@@ -1,7 +1,7 @@
 <template>
 <div id="main">
-    <control-component @voiture="getEtatVoiture" />
-    <display-component v-bind:voiture="voiture"/>
+    <control-component @newdatafromcar="getCarData" @changestate="changeState" />
+    <display-component v-bind:voiture="voiture" v-bind:state="state"/>
 </div>
 </template>
 
@@ -17,12 +17,18 @@ export default {
     },
     data() {
         return {
-          voiture: null
+          voiture: null,
+          // Indique si l'on est connecté ou pas, de base non
+          state: false
         }
     },
     methods: {
-      getEtatVoiture(voiture){
-        this.voiture = voiture;
+      getCarData(data){
+        this.voiture = data;
+      },
+      changeState(state){
+        // On envoie le nouvel état au DisplayComponent
+        this.state = state;
       }
     }
 }
