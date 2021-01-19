@@ -1,15 +1,84 @@
 <template>
 <section class="section">
-    <div class="container control-container">
-        <button class="button" v-on:click="connexion">Se Connecter</button>
-        <button class="button" v-on:click="deconnexion">Se Déconnecter</button>
+    <div class="container connexion-container">
+      <img 
+        class="image is-48x48" 
+        src="../assets/offline.png" 
+        v-bind:src="isconnecte()"
+      />
+      <button class="button" v-on:click="connexion">Se Connecter</button>
+      <button class="button" v-on:click="deconnexion">Se Déconnecter</button>
     </div>
     <div class="container control-container">
-        <button class="button" v-on:click="drapeau_vert"><img class="image is-24x24" src="../assets/drapeau_vert.png">Drapeau vert</button>
-        <button class="button" v-on:click="drapeau_rouge"><img class="image is-24x24" src="../assets/drapeau_rouge.png">Drapeau rouge</button>
-        <button class="button" v-on:click="drapeau_jaune"><img class="image is-24x24" src="../assets/drapeau_jaune.png">Drapeau Jaune</button>
-        <button class="button" v-on:click="drapeau_noir"><img class="image is-24x24" src="../assets/drapeau_noir.png">Drapeau noir</button>
-        <button class="button" v-on:click="drapeau_noir_damier"><img class="image is-24x24" src="../assets/drapeau_noir_damier.png">Drapeau Noir à Damier</button>
+        
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button bouton-drapeau" v-on:click="drapeau_vert"><img class="image is-24x24" src="../assets/drapeau_vert.png">Drapeau vert</button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Drapeau Vert: mode par défaut</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button bouton-drapeau" v-on:click="drapeau_rouge"><img class="image is-24x24" src="../assets/drapeau_rouge.png">Drapeau rouge</button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Drapeau Rouge: permet de stopper les voitures</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button bouton-drapeau" v-on:click="drapeau_jaune"><img class="image is-24x24" src="../assets/drapeau_jaune.png">Drapeau Jaune</button>
+            </br>
+            <input class="input" type="number" v-model="limite" placeholder="Vitesse limite" min="0" max="1" step="0.01">
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Drapeau Jaune: permet de limiter la vitesse des voitures</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button bouton-drapeau" v-on:click="drapeau_noir"><img class="image is-24x24" src="../assets/drapeau_noir.png">Drapeau noir</button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Drapeau Noir: permet de faire retourner les voitures au point de départ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button bouton-drapeau" v-on:click="drapeau_noir_damier"><img class="image is-24x24" src="../assets/drapeau_noir_damier.png">Drapeau Noir à Damier</button>
+            </br>
+            <input class="input" type="number" v-model="constante" placeholder="Vitesse constate" min="0" max="1" step="0.01">
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Drapeau Noir à damier: permet de faire rouler les voitures à vitesse constante</p>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 </section>
 </template>
@@ -19,8 +88,14 @@ export default {
     name: 'ControlComponent',
     data() {
         return {
-          // Variable contenant le socket 
-          websocket: null
+          // Variable contenant le socket
+          websocket: null,
+          // Permet de savoir si on est connecté, non de base
+          state: false,
+          // Drapeau jaune
+          limite: 0,
+          // Drapeau à damier
+          constante: 0
         }
     },
     methods: {
@@ -31,6 +106,9 @@ export default {
             let socket = new WebSocket("ws://localhost:8000/interface")
             // On stocke le socket
             this.websocket = socket
+
+            // On transmet le websocket aux autres composants
+            this.$emit('websocket', this.websocket)
 
             // Evenement lors de la connexion au serveur
             socket.onopen = function (event) {
@@ -48,48 +126,90 @@ export default {
                 socket.close()
             }
 
-            // On met l'état à faux, quand l'état est vraie, on indique au Display component que l'on est coonecté
+            // On met l'état à vrai, on indique au Display component que l'on est connecté
             this.$emit('changestate', true)
+            this.state = true
         },
         deconnexion() {
+          // On réinitialise les apparences
+          let boutons = document.getElementsByClassName("bouton-drapeau")
+          for (let bouton of boutons) {
+              bouton.classList.remove("is-info")
+          }
           // On indique au serveur que l'on se déconnecte
            let json_deconnexion = {
             "mode": "DECONNEXION"
           }
           this.websocket.send(JSON.stringify(json_deconnexion))
-            this.websocket.close()
-            // on indique au DisplayComponent que l'on se déconnecte
-            this.$emit('changestate', false)
+          this.websocket.close()
+          // on indique au DisplayComponent que l'on se déconnecte
+          this.$emit('changestate', false)
+          this.state = false
         },
         drapeau_vert() {
+          this.activeBouton(event);
           let json_drapeau_vert = {
             "mode": "DRAPEAU_VERT"
           }
           this.websocket.send(JSON.stringify(json_drapeau_vert))
         },
-        drapeau_rouge() {
+        drapeau_rouge(event) {
+          this.activeBouton(event);
           let json_drapeau_rouge = {
             "mode": "DRAPEAU_ROUGE"
           }
           this.websocket.send(JSON.stringify(json_drapeau_rouge))
         },
         drapeau_jaune() {
+          this.activeBouton(event);
           let json_drapeau_jaune = {
-            "mode": "DRAPEAU_JAUNE"
+            "mode": "DRAPEAU_JAUNE",
+            "limite": this.limite
           }
           this.websocket.send(JSON.stringify(json_drapeau_jaune))
         },
         drapeau_noir() {
+          this.activeBouton(event);
           let json_drapeau_noir = {
             "mode": "DRAPEAU_NOIR"
           }
           this.websocket.send(JSON.stringify(json_drapeau_noir))
         },
         drapeau_noir_damier() {
+          this.activeBouton(event);
           let json_drapeau_noir_damier = {
-            "mode": "DRAPEAU_NOIR_A_DAMIER"
+            "mode": "DRAPEAU_NOIR_A_DAMIER",
+            "constante": this.constante
           }
           this.websocket.send(JSON.stringify(json_drapeau_noir_damier))
+        },
+        activeBouton(event){
+          let boutonCible = event.srcElement;
+          // Si l'utilisateur a cliqué sur l'image du drapeau on récupère le parent, soit le bouton
+          if(event.srcElement.localName === "img") boutonCible = event.target.offsetParent
+          // On donne une apparence active au bouton
+          let boutons = document.getElementsByClassName("bouton-drapeau")
+          // On réinitialise les apparences
+          for (let bouton of boutons) {
+              bouton.classList.remove("is-info")
+          }
+          // On ajoute un apparence au bouton séléctionnné si on est connecté
+          if(this.state === true) boutonCible.classList.add("is-info")
+        },
+        // Cette fonction permet de changer l'icône indiquer si on accepte les connexions ou non
+        isconnecte(){
+          let nom = "offline"
+          // Si on est connecté
+          if(this.state === true) nom = "online"
+          return this.getImgUrl(nom)
+        },
+        // Cette fonction permet de récupérer une image après la compilation du template
+        // Elle utilisé pour afficher l'image des voitures, car on affiche leurs images après la compilation du template.
+        // Après la compilation, on ne peut plus accèder aux images via le dossier assets
+        // On récupère un lien du style /static/img/xxx.png
+        getImgUrl(nom){
+            var images = require.context('../assets/', false, /\.png$/)
+            return images('./' + nom + ".png")
         }
     }
 }
@@ -98,12 +218,32 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 
 <style scoped>
-.control-container {
-    text-align: center;
-    margin-bottom: 3%;
+.section{
+  background-color: #2c2f34;
+  height: 50%;
 }
 
-button {
-    margin: 0.5%;
+.connexion-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 3%;
+  padding-right: 50px;
+  width: 400px;
 }
+
+.control-container {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+input{
+  width: 175px;
+  margin-top: 5px;
+}
+
 </style>

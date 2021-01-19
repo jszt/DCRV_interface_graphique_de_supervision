@@ -1,7 +1,15 @@
 <template>
 <div id="main">
-    <control-component @newdatafromcar="getCarData" @changestate="changeState" />
-    <display-component v-bind:voiture="voiture" v-bind:state="state"/>
+    <display-component 
+      v-bind:voiture="voiture" 
+      v-bind:state="state"
+      v-bind:websocket="websocket"
+    />
+    <control-component 
+      @newdatafromcar="getCarData" 
+      @changestate="changeState"
+      @websocket="getWebsocket"
+    />
 </div>
 </template>
 
@@ -19,7 +27,9 @@ export default {
         return {
           voiture: null,
           // Indique si l'on est connecté ou pas, de base non
-          state: false
+          state: false,
+          // Gère la communication avec le serveur
+          websocket: null
         }
     },
     methods: {
@@ -29,6 +39,10 @@ export default {
       changeState(state){
         // On envoie le nouvel état au DisplayComponent
         this.state = state;
+      },
+      getWebsocket(websocket){
+        // On récupère le websocket permmettant de communiquer avec le serveur
+        this.websocket = websocket
       }
     }
 }
