@@ -6,8 +6,32 @@
         src="../assets/offline.png" 
         v-bind:src="isconnecte()"
       />
-      <button class="button" v-on:click="connexion">Se Connecter</button>
-      <button class="button" v-on:click="deconnexion">Se Déconnecter</button>
+      <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button" v-on:click="connexion">Se Connecter</button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Se connecter permet de démarrer une connexion pour que les voitures se connectent au serveur</p>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button" v-on:click="deconnexion">Se Déconnecter</button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu4" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p>Se déconnecter permet d'arrêter la connexion avec les voitures, une fois déconnecter les voitures ne peuvent plus se connecter</p>
+              </div>
+            </div>
+          </div>
+      </div>
+
     </div>
     <div class="container control-container">
         
@@ -93,9 +117,9 @@ export default {
           // Permet de savoir si on est connecté, non de base
           state: false,
           // Drapeau jaune
-          limite: 0,
+          limite: null,
           // Drapeau à damier
-          constante: 0
+          constante: null
         }
     },
     methods: {
