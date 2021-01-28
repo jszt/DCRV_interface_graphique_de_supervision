@@ -180,6 +180,7 @@ export default {
       voiture: {
         type: Object
       },
+      // Permet de savoir si l'interface est connectée au serveur
       state: {
         type: Boolean
       },
@@ -196,12 +197,12 @@ export default {
         switch (v.mode) {
             // Quand le serveur nous a spécifié la deconnexion de la voiture
             case 'DECONNEXION':
-                alert('ok')
                 let voiture = this.recuperationVoiture(v.id)
                 voiture.vitesse = 0
                 voiture.position = 0
                 voiture.tour = 0
                 voiture.etat = 0
+                alert(voiture.id + ' a été déconnectée')
             break;
             // Quand on recoit une position
             default:
@@ -280,13 +281,13 @@ export default {
             });
         },
         updateClassement() {
-            // On trie le tableau des voitures en fonction de l'etat de la voiture
-            this.voitures.sort(function (a, b) {
-                return b.etat - a.etat;
-            });
             // On trie le tableau des voitures en fonction de la position et des tours
             this.voitures.sort(function (a, b) {
                 if(a.tour >= b.tour) return b.position - a.position;
+            });
+            // On trie le tableau des voitures en fonction de l'etat de la voiture
+            this.voitures.sort(function (a, b) {
+                return b.etat - a.etat;
             });
         },
         // Cette fonction permet de chercher une voiture dans le tableau répertoriant toutes les voitures
@@ -299,7 +300,7 @@ export default {
             this.voitures.forEach(v => {
                 if(v.id === id){
                 voitureTrouvee = v
-                } 
+                }
             })
             return voitureTrouvee
         },

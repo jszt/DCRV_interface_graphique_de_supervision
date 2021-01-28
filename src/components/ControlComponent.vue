@@ -136,7 +136,7 @@ export default {
 
             // Evenement lors de la connexion au serveur
             socket.onopen = function (event) {
-                alert('connexion au serveur effectuée')
+                alert('Connexion au serveur effectuée')
             }
 
             // Evenement lors de la réception d'un message de la part
