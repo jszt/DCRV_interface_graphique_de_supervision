@@ -269,7 +269,6 @@ export default {
             this.voitures.forEach((v, index) => {
                 if((v.id === voiture.id) && v.etat != 2) this.voitures[index].etat = 1;
             });
-            
         },
         updateVoiture(voiture){
             this.voitures.forEach((v, index) => {
@@ -281,13 +280,13 @@ export default {
             });
         },
         updateClassement() {
-            // On trie le tableau des voitures en fonction de la position et des tours
-            this.voitures.sort(function (a, b) {
-                if(a.tour >= b.tour) return b.position - a.position;
-            });
             // On trie le tableau des voitures en fonction de l'etat de la voiture
             this.voitures.sort(function (a, b) {
                 return b.etat - a.etat;
+            });
+            // On trie le tableau des voitures en fonction de la position et des tours
+            this.voitures.sort(function (a, b) {
+                if(a.tour >= b.tour) return b.position - a.position;
             });
         },
         // Cette fonction permet de chercher une voiture dans le tableau répertoriant toutes les voitures
