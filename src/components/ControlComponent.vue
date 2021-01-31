@@ -125,8 +125,8 @@ export default {
     connexion () {
       // On ouvre une connexion web socket avec le paramètre interface qui correspond à l'id de ce client
       // Ici on demande une connexion sur l'ip du rpi
-      //let socket = new WebSocket('ws://10.3.141.1:8000/interface')
-       let socket = new WebSocket('ws://localhost:8000/interface')
+      let socket = new WebSocket('ws://10.3.141.1:8000/interface')
+      // let socket = new WebSocket('ws://localhost:8000/interface')
       // On stocke le socket
       this.websocket = socket
 
