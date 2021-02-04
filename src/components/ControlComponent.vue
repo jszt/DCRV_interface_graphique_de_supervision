@@ -63,7 +63,7 @@
             <div class="dropdown-trigger">
                 <button class="button bouton-drapeau" v-on:click="drapeau_jaune"><img class="image is-24x24" src="../assets/drapeau_jaune.png">Drapeau Jaune</button>
                 <br>
-                <input class="input" type="number" v-model="limite" placeholder="Vitesse limite" min="0" max="1" step="0.01">
+                <input class="input" type="number" v-model="limite" placeholder="Vitesse limite" min="-1" max="1" step="0.01">
             </div>
             <div class="dropdown-menu" id="dropdown-menu4" role="menu">
                 <div class="dropdown-content">
@@ -91,7 +91,7 @@
             <div class="dropdown-trigger">
                 <button class="button bouton-drapeau" v-on:click="drapeau_noir_damier"><img class="image is-24x24" src="../assets/drapeau_noir_damier.png">Drapeau Noir à Damier</button>
                 <br>
-                <input class="input" type="number" v-model="constante" placeholder="Vitesse constante" min="0" max="1" step="0.01">
+                <input class="input" type="number" v-model="constante" placeholder="Vitesse constante" min="-1" max="1" step="0.01">
             </div>
             <div class="dropdown-menu" id="dropdown-menu4" role="menu">
                 <div class="dropdown-content">
@@ -187,7 +187,7 @@ export default {
     drapeau_jaune () {
       this.activeBouton(event)
       if (this.limite > 1) this.limite = 1
-      if (this.limite < 0) this.limite = 0
+      if (this.limite < -1) this.limite = -1
       let jsonDrapeauJaune = {
         'mode': 'DRAPEAU_JAUNE',
         'limite': this.limite
@@ -203,7 +203,7 @@ export default {
     },
     drapeau_noir_damier () {
       if (this.constante > 1) this.constante = 1
-      if (this.constante < 0) this.constante = 0
+      if (this.constante < -1) this.constante = -1
       this.activeBouton(event)
       let jsonDrapeauNoirDamier = {
         'mode': 'DRAPEAU_NOIR_A_DAMIER',
